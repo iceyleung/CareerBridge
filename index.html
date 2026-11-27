@@ -6,6 +6,9 @@
 .cb-nav{display:flex;gap:4px;flex-wrap:wrap}
 .cb-nav a{color:#fff;text-decoration:none;padding:7px 11px;border-radius:9px;font-size:13px}
 .cb-nav a:hover{background:rgba(255,255,255,.18)}
+.cb-nav a.active{background:#fff;color:#174a91;font-weight:700}
+.cb-view{display:none}
+.cb-view.active{display:block}
 .cb-hero-stage{position:relative;overflow:hidden;min-height:280px}
 .cb-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .8s ease}
 .cb-slide.active{opacity:1}
@@ -37,9 +40,15 @@
 .cb-post-body p{color:#536985;font-size:13px;margin:0}
 .cb-post-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#546b86}
 .cb-pending{background:#fff4e5;color:#b26014;padding:3px 10px;border-radius:999px;font-size:12px}
-.cb-video-row{display:flex;gap:16px;overflow-x:auto;padding-bottom:14px;scroll-snap-type:x mandatory}
-.cb-video-card{flex:0 0 200px;scroll-snap-align:start;background:#fff;border:1px solid #dce8f8;border-radius:15px;overflow:hidden;box-shadow:0 8px 22px #1c4a8310}
-.cb-video-thumb{position:relative;aspect-ratio:9/16;background:#123b82;display:grid;place-items:center;overflow:hidden}
+.cb-video-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media(max-width:900px){.cb-video-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.cb-video-grid{grid-template-columns:1fr}}
+.cb-video-card{background:#fff;border:1px solid #dce8f8;border-radius:15px;overflow:hidden;box-shadow:0 8px 22px #1c4a8310;display:flex;flex-direction:column}
+.cb-video-card.wide{grid-column:span 2}
+@media(max-width:560px){.cb-video-card.wide{grid-column:span 1}}
+.cb-video-thumb{position:relative;background:#123b82;display:grid;place-items:center;overflow:hidden}
+.cb-video-card.tall .cb-video-thumb{aspect-ratio:9/16}
+.cb-video-card.wide .cb-video-thumb{aspect-ratio:16/9}
 .cb-video-thumb img{width:100%;height:100%;object-fit:cover}
 .cb-play{position:absolute;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.92);color:#1769ca;border:none;display:grid;place-items:center;box-shadow:0 8px 22px #1c4a8310}
 .cb-play::after{content:"";border-left:15px solid currentColor;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
@@ -51,12 +60,14 @@
 .cb-mini:hover{background:#e8f1fb}
 .cb-news-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 @media(max-width:900px){.cb-news-grid{grid-template-columns:1fr}}
-.cb-news-card{background:#fff;border:1px solid #dce8f8;border-left:4px solid #2675d8;border-radius:15px;padding:18px;box-shadow:0 8px 22px #1c4a8310}
+.cb-news-card{background:#fff;border:1px solid #dce8f8;border-left:4px solid #2675d8;border-radius:15px;padding:18px;box-shadow:0 8px 22px #1c4a8310;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.cb-news-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px #1c4a8318}
 .cb-news-card h3{color:#123b82;margin:0 0 7px;font-size:16px}
 .cb-news-card p{color:#536985;font-size:13px;margin:0}
-.cb-source-table{width:100%;border-collapse:collapse;background:#fff;border-radius:15px;overflow:hidden}
-.cb-source-table th,.cb-source-table td{padding:13px;border-bottom:1px solid #edf1f7;text-align:left;font-size:13px;vertical-align:top}
-.cb-source-table th{background:#e8f1fb;color:#123b82}
+.cb-news-more{display:inline-block;margin-top:10px;color:#1769ca;font-size:12px;font-weight:700}
+.cb-news-detail{display:flex;flex-direction:column;gap:10px}
+.cb-news-detail li{line-height:1.65;color:#33506e;margin:0}
+.cb-news-detail ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px}
 .cb-popup-backdrop{position:fixed;inset:0;background:#091c3ca8;z-index:120;display:none;align-items:center;justify-content:center;padding:20px}
 .cb-popup-backdrop.open{display:flex}
 .cb-popup{background:#fff;border-radius:16px;max-width:720px;width:100%;overflow:hidden;box-shadow:0 8px 25px #1c4a8320}
@@ -64,33 +75,34 @@
 .cb-popup-body{padding:19px}
 .cb-popup-body iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:12px}
 .cb-popup-meta{margin-top:13px;color:#546b86;font-size:13px;display:flex;flex-direction:column;gap:5px}
-</style></head><body><header class="top"><div class="topbar"><div class="brand">CareerBridge</div><nav class="cb-nav"><a href="#cbJobs" data-cb="nav.jobs">채용공고</a><a href="#cbMagazine" data-cb="nav.magazine">매거진</a><a href="#cbVideos" data-cb="nav.videos">숏폼</a><a href="#cbSources" data-cb="nav.sources">출처</a></nav><button id="language" class="lang" type="button">한국어</button></div><div class="hero cb-hero-stage"><div id="cbSlides" class="cb-slide-wrap"></div><div class="cb-hero-inner"><span class="cb-hero-badge" data-cb="hero.badge">실제 촬영 사진 기반 모션 슬라이드쇼</span><h1 data-t="hero">中韩职位推荐</h1><p data-t="subtitle">通过本地示例职位探索中韩职业方向，按个人条件筛选并查看参考匹配度。</p><div class="cb-hero-actions"><a href="#cbJobs" class="cb-btn cb-btn-primary" data-cb="hero.ctaJobs">채용정보 바로가기</a><a href="#cbMagazine" class="cb-btn cb-btn-ghost" data-cb="hero.ctaMag">매거진 보기</a></div></div><div class="cb-dots" id="cbDots"></div><div class="cb-controls"><button id="cbPlay" class="cb-dotbtn" type="button" aria-label="play/pause">⏸</button></div></div></header><main class="wrap"><div class="notice" data-t="disclaimer">所有职位均为虚构演示示例，不代表实时招聘；薪资仅供演示。匹配度是本地规则参考值，不是录用概率。</div><!-- 신규: 매거진 -->
+</style></head><body><header class="top"><div class="topbar"><div class="brand">CareerBridge</div><nav class="cb-nav" id="cbNav"><a href="#magazine" data-nav="magazine" data-cb="nav.magazine">매거진</a><a href="#jobs" data-nav="jobs" data-cb="nav.jobs">채용 추천</a><a href="#resume" data-nav="resume" data-cb="nav.resume">한중 이력서</a><a href="#interview" data-nav="interview" data-cb="nav.interview">면접 준비</a><a href="#analysis" data-nav="analysis" data-cb="nav.analysis">커리어 분석</a></nav><button id="language" class="lang" type="button">한국어</button></div><div class="hero cb-hero-stage"><div id="cbSlides" class="cb-slide-wrap"></div><div class="cb-hero-inner"><h1 data-t="hero">中韩职位推荐</h1><p data-t="subtitle">通过本地示例职位探索中韩职业方向，按个人条件筛选并查看参考匹配度。</p><div class="cb-hero-actions"><a href="#jobs" class="cb-btn cb-btn-primary" data-cb="hero.ctaJobs">채용정보 바로가기</a><a href="#magazine" class="cb-btn cb-btn-ghost" data-cb="hero.ctaMag">매거진 보기</a></div></div><div class="cb-dots" id="cbDots"></div><div class="cb-controls"><button id="cbPlay" class="cb-dotbtn" type="button" aria-label="play/pause">⏸</button></div></div></header><main class="wrap"><div class="cb-view active" data-view="magazine" id="viewMagazine"><div class="notice" data-t="disclaimer">所有职位均为虚构演示示例，不代表实时招聘；薪资仅供演示。匹配度是本地规则参考值，不是录用概率。</div>
 <section class="cb-section" id="cbMagazine">
   <div class="cb-section-head cb-head-row">
     <div><h2 data-cb="mag.title">CareerBridge 매거진</h2><p data-cb="mag.sub">취업 정보와 실제 경험을 공유하는 디지털 콘텐츠</p></div>
-    <a href="#cbMagazine" class="cb-btn cb-btn-primary" data-cb="mag.more">매거진 더 보기</a>
   </div>
   <div class="cb-post-grid" id="cbPostGrid"></div>
 </section>
 
-<!-- 신규: 숏폼 -->
-<section class="cb-section" id="cbVideos">
+<!-- 영상 (매거진에 통합) -->
+<section class="cb-section" id="cbMagVideos">
   <div class="cb-section-head"><h2 data-cb="vid.title">인기 숏폼 · 인터뷰 영상</h2><p data-cb="vid.sub">30~60초 세로형 콘텐츠</p></div>
-  <div class="cb-video-row" id="cbVideoRow"></div>
+  <div class="cb-video-grid" id="cbVideoGrid"></div>
 </section>
 
-<!-- 신규: 카드뉴스 -->
+<!-- 카드뉴스 -->
 <section class="cb-section" id="cbNews">
   <div class="cb-section-head"><h2 data-cb="news.title">한·중 취업 정보 카드뉴스</h2><p data-cb="news.sub">채용 문화와 준비 체크리스트</p></div>
   <div class="cb-news-grid" id="cbNewsGrid"></div>
 </section>
+</div><!-- /viewMagazine -->
 
-<div class="layout" id="cbJobs"><aside class="panel filters"><h2 data-t="filters">筛选与匹配条件</h2><div id="form"></div><div id="error" class="error" role="alert"></div><button id="reset" class="secondary wide" data-t="reset">重置筛选</button><p id="storageWarning" class="foot" hidden></p></aside><section class="panel results"><h2 data-t="jobs">示例职位</h2><div class="meta"><span id="count" aria-live="polite"></span><span id="sort"></span></div><div id="cards" class="cards"></div><div id="noResults"></div><button id="more" class="primary more" data-t="more" hidden>加载更多</button></section></div><p class="foot" data-t="footer">本地数据可离线使用。第三方搜索结果可能变化、需要登录或受网络限制；点击链接不保证存在职位。</p></main><!-- 신규: 콘텐츠 출처 -->
-<section class="cb-section" id="cbSources">
-  <div class="cb-section-head"><h2 data-cb="src.title">콘텐츠 출처 및 라이선스</h2><p data-cb="src.intro">본 사이트에 사용된 사진·영상의 출처, 제작자, 이용 허가 조건을 기록합니다. 배포 전 원본 라이선스를 확인하세요.</p></div>
-  <table class="cb-source-table"><thead><tr><th data-cb="src.colSubject">콘텐츠</th><th data-cb="src.colAuthor">제작자</th><th data-cb="src.colLicense">라이선스</th><th data-cb="src.colNote">비고</th></tr></thead><tbody id="cbSourceBody"></tbody></table>
-  <p class="foot" data-cb="src.note">본 사이트의 스톡 인물은 일반 참고 이미지이며, 실제 이용자·취업 성공 사례가 아닙니다.</p>
-</section>
+<div class="cb-view" data-view="jobs" id="viewJobs">
+<div class="layout" id="cbJobs"><aside class="panel filters"><h2 data-t="filters">筛选与匹配条件</h2><div id="form"></div><div id="error" class="error" role="alert"></div><button id="reset" class="secondary wide" data-t="reset">重置筛选</button><p id="storageWarning" class="foot" hidden></p></aside><section class="panel results"><h2 data-t="jobs">示例职位</h2><div class="meta"><span id="count" aria-live="polite"></span><span id="sort"></span></div><div id="cards" class="cards"></div><div id="noResults"></div><button id="more" class="primary more" data-t="more" hidden>加载更多</button></section></div><p class="foot" data-t="footer">本地数据可离线使用。第三方搜索结果可能变化、需要登录或受网络限制；点击链接不保证存在职位。</p></div>
+
+<div class="cb-view" data-view="resume" id="viewResume"><div class="assist-host"></div></div>
+<div class="cb-view" data-view="interview" id="viewInterview"><div class="assist-host"></div></div>
+<div class="cb-view" data-view="analysis" id="viewAnalysis"><div class="assist-host"></div></div>
+</main>
 
 <div id="cbPopupBackdrop" class="cb-popup-backdrop">
   <div class="cb-popup" role="dialog" aria-modal="true">
@@ -215,7 +227,7 @@ const assistantData=Object.fromEntries(ASSIST_FIELDS.map(k=>[k,'']));const assis
 let assistantTab='jobs';const generated={resume:null,interview:null,analysis:null};
 const tipsData=[['研究目标岗位和招聘要求，列出与自身经历相符的证据。','지원 직무와 채용 요건을 조사하고 본인의 경험에 해당하는 근거를 정리하세요.'],['准备30—60秒自我介绍，突出目标与真实经历。','30~60초 자기소개를 준비하고 목표와 실제 경험을 강조하세요.'],['使用STAR（情境、任务、行动、结果）组织真实事例。','STAR(상황·과제·행동·결과) 방식으로 실제 사례를 정리하세요.'],['练习团队合作、冲突解决和学习经历等行为面试问题。','협업, 갈등 해결, 학습 경험 등 행동 면접 질문을 연습하세요.'],['跨语言沟通时确认理解，避免对文化作绝对化假设。','다국어 소통에서는 이해 여부를 확인하고 문화에 대한 단정은 피하세요.'],['线上面试前检查网络、麦克风、背景和镜头。','화상 면접 전 네트워크·마이크·배경·카메라를 확인하세요.'],['准备向面试官提问工作职责、团队协作与成长机会。','면접관에게 담당 업무·팀 협업·성장 기회에 대해 질문할 내용을 준비하세요.'],['面试后记录问题和改进点，进行复盘。','면접 후 질문과 개선점을 기록해 복기하세요.']];
 const categoryQuestions={it:['你如何排查程序错误？','오류를 어떻게 분석하고 해결하나요?'],trade:['如何处理跨境沟通中的交付问题？','국경 간 거래에서 납기 문제를 어떻게 해결하나요?'],marketing:['如何评估营销活动效果？','마케팅 캠페인 성과를 어떻게 평가하나요?'],design:['如何解释设计决策？','디자인 의사결정을 어떻게 설명하나요?'],education:['如何适应不同学习者？','학습자별 차이를 어떻게 반영하나요?'],admin:['如何同时安排多项行政任务？','여러 행정 업무의 우선순위를 어떻게 정하나요?']};
-function assistSection(){let root=document.getElementById('assistRoot');if(root)return;root=document.createElement('section');root.id='assistRoot';root.className='assist-root';document.querySelector('main').insertBefore(root,document.querySelector('.layout'));assistRender();}
+function assistSection(){assistRender();}
 function safeNode(tag,cls,text){return el(tag,cls,text)}
 function fieldLine(key){
  let wrap=safeNode('div','assist-field');let label=safeNode('label','',A(key));label.htmlFor='assist-'+key;wrap.append(label);
@@ -231,7 +243,7 @@ function fieldLine(key){
  }
  return wrap;
 }
-function assistRender(){let root=document.getElementById('assistRoot');if(!root)return;root.replaceChildren();let nav=safeNode('div','assist-nav');ASSIST_TEXT[lang].nav.forEach((label,i)=>{let key=['jobs','resume','interview','analysis'][i],btn=safeNode('button',assistantTab===key?'primary':'secondary',label);btn.type='button';btn.addEventListener('click',()=>{assistantTab=key;assistRender();if(key==='jobs')document.querySelector('.layout').scrollIntoView({behavior:'smooth',block:'start'});});nav.append(btn)});root.append(nav);if(assistantTab==='jobs')return;let panel=safeNode('section','panel assist-panel');panel.append(safeNode('h2','',ASSIST_TEXT[lang].nav[['jobs','resume','interview','analysis'].indexOf(assistantTab)]),safeNode('p','foot',A('intro')));let grid=safeNode('div','assist-fields');ASSIST_FIELDS.forEach(k=>grid.append(fieldLine(k)));panel.append(grid);let action=safeNode('button','primary',A(assistantTab));action.type='button';action.addEventListener('click',()=>generateAssist(assistantTab));panel.append(action);let err=safeNode('p','error');err.id='assistError';err.setAttribute('role','alert');panel.append(err);if(assistantTab==='interview'){let tip=safeNode('div','assist-tips');tip.append(safeNode('h3','',A('tips')));tipsData.forEach((pair,i)=>tip.append(safeNode('p','',(i+1)+'. '+pair[lang==='zh'?0:1])));panel.append(tip)}let result=safeNode('div','assist-output');result.id='assistOutput';panel.append(result);root.append(panel);showAssistOutput();}
+function assistRender(){let host=document.querySelector('.cb-view.active .assist-host');if(!host)return;host.replaceChildren();if(assistantTab==='jobs')return;let panel=safeNode('section','panel assist-panel');panel.append(safeNode('h2','',ASSIST_TEXT[lang].nav[['jobs','resume','interview','analysis'].indexOf(assistantTab)]),safeNode('p','foot',A('intro')));let grid=safeNode('div','assist-fields');ASSIST_FIELDS.forEach(k=>grid.append(fieldLine(k)));panel.append(grid);let action=safeNode('button','primary',A(assistantTab));action.type='button';action.addEventListener('click',()=>generateAssist(assistantTab));panel.append(action);let err=safeNode('p','error');err.id='assistError';err.setAttribute('role','alert');panel.append(err);if(assistantTab==='interview'){let tip=safeNode('div','assist-tips');tip.append(safeNode('h3','',A('tips')));tipsData.forEach((pair,i)=>tip.append(safeNode('p','',(i+1)+'. '+pair[lang==='zh'?0:1])));panel.append(tip)}let result=safeNode('div','assist-output');result.id='assistOutput';panel.append(result);host.append(panel);showAssistOutput();}
 function sourceValue(k){return assistantData[k].trim()}
 function selectedFacts(){let c=state.country?state.country==='CN'?(lang==='zh'?'中国':'중국'):(lang==='zh'?'韩国':'한국'):'';return {country:c,category:state.category?catName(state.category):'',major:state.major?majorName(state.major):'',degree:state.graduated?t(state.graduated==='none'?'degreeNone':state.graduated):state.studying?TXT[locale][state.studying==='none'?'degreeNone':state.studying]:'',languages:['zh','ko','en'].filter(k=>state[k]).map(k=>tr(langNames[k])+' '+(Number(state[k])===4?t('native'):t(['','basic','mid','high'][Number(state[k])]))).join(', '),years:state.years};}
 function assistFacts(locale){let original=lang;lang=locale;let f=selectedFacts();lang=original;return f;}
@@ -367,21 +379,19 @@ const originalTranslate=translate;translate=function(){originalTranslate();assis
 (function(){
   const DICT={
     ko:{
-      "nav.jobs":"채용공고","nav.magazine":"매거진","nav.videos":"숏폼","nav.sources":"출처",
-      "hero.badge":"실제 촬영 사진 기반 모션 슬라이드쇼","hero.ctaJobs":"채용정보 바로가기","hero.ctaMag":"매거진 보기",
-      "mag.title":"CareerBridge 매거진","mag.sub":"취업 정보와 실제 경험을 공유하는 디지털 콘텐츠","mag.more":"매거진 더 보기","mag.read":"읽기","mag.pending":"콘텐츠 준비 중",
-      "vid.title":"인기 숏폼 · 인터뷰 영상","vid.sub":"30~60초 세로형 콘텐츠","vid.share":"공유","vid.source":"원본 영상","vid.author":"제작자",
-      "news.title":"한·중 취업 정보 카드뉴스","news.sub":"채용 문화와 준비 체크리스트",
-      "src.title":"콘텐츠 출처 및 라이선스","src.intro":"본 사이트에 사용된 사진·영상의 출처, 제작자, 이용 허가 조건을 기록합니다. 배포 전 원본 라이선스를 확인하세요.","src.colSubject":"콘텐츠","src.colAuthor":"제작자","src.colLicense":"라이선스","src.colNote":"비고","src.note":"본 사이트의 스톡 인물은 일반 참고 이미지이며, 실제 이용자·취업 성공 사례가 아닙니다.",
+      "nav.magazine":"매거진","nav.jobs":"채용 추천","nav.resume":"한중 이력서","nav.interview":"면접 준비","nav.analysis":"커리어 분석",
+      "hero.ctaJobs":"채용정보 바로가기","hero.ctaMag":"매거진 보기",
+      "mag.title":"CareerBridge 매거진","mag.sub":"취업 정보와 실제 경험을 공유하는 디지털 콘텐츠","mag.read":"읽기","mag.pending":"콘텐츠 준비 중",
+      "vid.title":"매거진 영상","vid.sub":"유튜브 영상을 사이트 내에서 바로 재생합니다","vid.source":"원본 영상",
+      "news.title":"한·중 취업 정보 카드뉴스","news.sub":"채용 문화와 준비 체크리스트","news.more":"자세히 보기",
       "cat.class":"1분 취업 클래스","cat.interview":"한·중 청년 인터뷰","cat.vlog":"글로벌 직장인 VLOG","cat.news":"취업 카드뉴스"
     },
     zh:{
-      "nav.jobs":"招聘职位","nav.magazine":"杂志","nav.videos":"短视频","nav.sources":"来源",
-      "hero.badge":"基于实拍照片的动态幻灯片","hero.ctaJobs":"查看职位","hero.ctaMag":"浏览杂志",
-      "mag.title":"CareerBridge 杂志","mag.sub":"分享求职信息与真实经验的数字内容","mag.more":"查看更多杂志","mag.read":"阅读","mag.pending":"内容准备中",
-      "vid.title":"热门短视频 · 访谈","vid.sub":"30~60 秒竖屏内容","vid.share":"分享","vid.source":"原视频","vid.author":"制作者",
-      "news.title":"中韩求职图文资讯","news.sub":"招聘文化与准备清单",
-      "src.title":"内容来源与许可","src.intro":"记录本站图片、视频的来源、制作者与使用许可。部署前请核对原始许可。","src.colSubject":"内容","src.colAuthor":"制作者","src.colLicense":"许可","src.colNote":"备注","src.note":"本站素材人物均为一般参考图片，不代表真实用户或就业成功案例。",
+      "nav.magazine":"杂志","nav.jobs":"职位推荐","nav.resume":"双语简历","nav.interview":"面试准备","nav.analysis":"职业分析",
+      "hero.ctaJobs":"查看职位","hero.ctaMag":"浏览杂志",
+      "mag.title":"CareerBridge 杂志","mag.sub":"分享求职信息与真实经验的数字内容","mag.read":"阅读","mag.pending":"内容准备中",
+      "vid.title":"杂志视频","vid.sub":"在站内直接播放 YouTube 视频","vid.source":"原视频",
+      "news.title":"中韩求职图文资讯","news.sub":"招聘文化与准备清单","news.more":"查看详情",
       "cat.class":"一分钟求职课堂","cat.interview":"中韩青年访谈","cat.vlog":"全球职场VLOG","cat.news":"求职资讯"
     }
   };
@@ -409,24 +419,17 @@ const originalTranslate=translate;translate=function(){originalTranslate();assis
   ];
 
   const VIDEOS=[
-    {id:1,cat:"class",youtubeId:"",title:{ko:"면접 자기소개 1분 구성법",zh:"面试自我介绍一分钟结构"},duration:"0:45",summary:{ko:"자기소개를 도입·강점·포부로 나눠 구성하는 방법.",zh:"将自我介绍分为开场、优势与规划进行整理。"},source:"",author:"",status:"pending"},
-    {id:2,cat:"interview",youtubeId:"",title:{ko:"유학생 취업 준비 인터뷰",zh:"留学生求职访谈"},duration:"1:00",summary:{ko:"인터뷰 영상을 준비 중입니다.",zh:"访谈视频正在准备中。"},source:"",author:"",status:"pending"},
-    {id:3,cat:"vlog",youtubeId:"",title:{ko:"해외 직장인의 하루",zh:"海外职场人的一天"},duration:"0:52",summary:{ko:"VLOG 영상을 준비 중입니다.",zh:"VLOG 视频正在准备中。"},source:"",author:"",status:"pending"},
-    {id:4,cat:"news",youtubeId:"",title:{ko:"한중 취업 트렌드 정리",zh:"中韩求职趋势整理"},duration:"0:38",summary:{ko:"카드뉴스 기반 숏폼을 준비 중입니다.",zh:"基于图文卡片的短视频正在准备中。"},source:"",author:"",status:"pending"},
-    {id:5,cat:"class",youtubeId:"",title:{ko:"이력서 스킬 표현 다듬기",zh:"打磨简历技能表述"},duration:"0:40",summary:{ko:"스킬 문구를 구체적으로 다듬는 예시.",zh:"准备技能表述具体化的示例。"},source:"",author:"",status:"pending"},
-    {id:6,cat:"news",youtubeId:"",title:{ko:"해외 취업 시 주의사항",zh:"海外求职注意事项"},duration:"0:55",summary:{ko:"주의사항 숏폼을 준비 중입니다.",zh:"注意事项短视频正在准备中。"},source:"",author:"",status:"pending"}
+    {id:1,youtubeId:"EHwsEN438zY",ratio:"wide",title:{ko:"영상 ① · 한중 취업 관련",zh:"视频① · 中韩求职相关"},source:"https://youtu.be/EHwsEN438zY?si=X1WfuYP0qRJs4GbS",summary:{ko:"유튜브 영상을 사이트 내 팝업으로 재생합니다.",zh:"在站内弹窗中播放该 YouTube 视频。"}},
+    {id:2,youtubeId:"bUNmVESdj44",ratio:"tall",title:{ko:"숏폼 영상 ②",zh:"短视频 ②"},source:"https://youtube.com/shorts/bUNmVESdj44?si=16nh7CtuZWBRLA4u",summary:{ko:"세로형 Shorts 영상입니다.",zh:"竖屏 Shorts 视频。"}},
+    {id:3,youtubeId:"zJftVJ8Tdi8",ratio:"tall",title:{ko:"숏폼 영상 ③",zh:"短视频 ③"},source:"https://youtube.com/shorts/zJftVJ8Tdi8?si=5hEvr8oJUCqVPHlN",summary:{ko:"세로형 Shorts 영상입니다.",zh:"竖屏 Shorts 视频。"}}
   ];
 
   const NEWS=[
-    {id:1,title:{ko:"외국인 유학생 취업 비자 · 필요 서류 체크리스트",zh:"外国留学生就业签证与材料清单"},summary:{ko:"비자 종류, 발급 절차, 준비 서류를 국가별로 확인하세요. 최종 내용은 관공서 공고를 확인하세요.",zh:"按国家核对签证类型、办理流程与材料，最终以官方公告为准。"}},
-    {id:2,title:{ko:"한·중 직장 문화 비교: 의사소통과 회의",zh:"中韩职场文化对比：沟通与会议"},summary:{ko:"보고 문화, 의사결정 속도, 회의 진행 방식의 차이를 일반적인 참고 사례로 정리합니다.",zh:"以一般参考案例梳理汇报文化、决策速度与会议方式的差异。"}},
-    {id:3,title:{ko:"해외 취업 시 확인할 기본 체크리스트",zh:"海外求职基础核对清单"},summary:{ko:"언어 증명, 학력 서류, 경험 정리, 지원 시기 등 기본 항목을 점검하세요.",zh:"核对语言证明、学历材料、经历整理与投递时机等基础项目。"}}
-  ];
-
-  const SOURCES=[
-    {url:"https://aka.doubaocdn.com/l/3t5ScErMIG",subject:{ko:"서울 한강 야경",zh:"首尔汉江夜景"},author:{ko:"검색 캐시 (원작자 확인 필요)",zh:"搜索缓存（需核对原作者）"},license:{ko:"배포 전 원본 라이선스 확인 필요",zh:"部署前需核对原始许可"},note:{ko:"임시 캐시 링크, 원본 교체 권장",zh:"临时缓存链接，建议替换为原始文件"}},
-    {url:"https://aka.doubaocdn.com/l/OAhmn4JeR2",subject:{ko:"상하이 푸둥 전경",zh:"上海浦东全景"},author:{ko:"검색 캐시 (원작자 확인 필요)",zh:"搜索缓存（需核对原作者）"},license:{ko:"배포 전 원본 라이선스 확인 필요",zh:"部署前需核对原始许可"},note:{ko:"임시 캐시 링크, 원본 교체 권장",zh:"临时缓存链接，建议替换为原始文件"}},
-    {url:"https://www.pexels.com/license/",subject:{ko:"Pexels 스톡 사진 (타이핑·회의·오피스 등)",zh:"Pexels 素材照片（打字·会议·办公室等）"},author:{ko:"Pexels 개별 작가 (사이트에서 확인)",zh:"Pexels 各作者（见网站）"},license:{ko:"Pexels License — 무료·상업적 이용 가능, 출처 표시 권장",zh:"Pexels License — 免费可商用，建议署名"},note:{ko:"인물은 일반 참고 이미지",zh:"人物为一般参考图"}}
+    {id:1,title:{ko:"한중 이력서 준비 포인트",zh:"中韩双语简历准备要点"},summary:{ko:"이력서 구조, 사진, 학력 순서, 기술 표현, 프로젝트 경험을 점검하세요.",zh:"核对简历结构、照片、学历顺序、技能表述与项目经历。"},detail:{ko:["사진: 일반적으로 정장 또는 단정한 증명사진을 사용하며, 국가별 관행을 확인하세요.","학력 순서: 한국은 보통 최근 학력부터, 중국은 입학 연도 순으로 적는 경우가 많아 지원 양식을 따르세요.","기술 표현: 모호한 단어 대신 도구·프레임워크·수준을 구체적으로 적으세요.","프로젝트 경험: 역할, 수행한 일, 정량적 성과를 STAR 방식으로 정리하세요.","중한 대응: 제출 전에 양국어 문장의 의미와 사실이 일치하는지 직접 대조하세요."],zh:["照片：通常使用正装或整洁证件照，按目标国家惯例选择。","学历顺序：韩国多由最近学历往前写，中国常按入学年份排列，以招聘方格式为准。","技能表述：用具体工具、框架与水平代替笼统形容词。","项目经历：用 STAR 方式写清角色、所做之事与可量化成果。","中韩对应：提交前逐句对照两种语言，确认语义与事实一致。"]}},
+    {id:2,title:{ko:"면접 빈출 질문과 답변 틀",zh:"面试高频问题与回答框架"},summary:{ko:"자기소개, 지원 동기, 강점, 경험, 단점, 역질문을 준비하세요.",zh:"准备自我介绍、应聘动机、优势、经历、缺点与反问。"},detail:{ko:["자기소개(30~60초): 지원 직무와 연결되는 강점과 실제 경험을 먼저 제시하세요.","지원 동기: 왜 이 직무·이 기업인지, 본인의 목표와 연결해 설명하세요.","강점과 근거: 강점 하나를 실제 사례와 수치로 뒷받침하세요.","경험 질문: 상황·과제·행동·결과(STAR) 순으로 답변하세요.","단점: 개선하려는 노력과 함께 솔직하게 제시하세요.","역질문: 담당 업무, 팀 협업, 성장 기회에 대해 질문할 내용을 준비하세요."],zh:["自我介绍（30–60 秒）：先给出与目标岗位相关的优势和真实经历。","应聘动机：说明为何选择该岗位与企业，并与个人目标相连。","优势与依据：用真实案例和数据支撑一项优势。","经历问题：按情境、任务、行动、结果（STAR）作答。","缺点：如实说明，并附上正在改进的努力。","反问：准备好询问工作职责、团队协作与成长机会。"]}},
+    {id:3,title:{ko:"유학생 취업 비자 · 필요 서류 체크리스트",zh:"留学生就业签证与材料清单"},summary:{ko:"비자 종류, 발급 절차, 준비 서류를 국가별 공고에서 확인하세요.",zh:"按官方公告核对签证类型、办理流程与材料。"},detail:{ko:["비자 종류: 취업비자·구직비자 등 목적에 맞는 종류를 확인하세요.","기본 서류: 여권, 사진, 졸업(예정) 증명서, 성적증명서, 경력·인턴 증명을 준비하세요.","초청·채용 관련: 채용 계약 또는 회사 측 초청 자료가 필요할 수 있습니다.","신청 절차: 관공서·비자 센터의 최신 공고와 서류 제출 방식을 확인하세요.","주의: 최종 요건은 국가별 공식 발표를 따르며, 이 자료는 일반 참고입니다."],zh:["签证类型：确认就业签证、求职签证等与目的相符的类别。","基础材料：护照、照片、毕业（在读）证明、成绩单、实习/经历证明。","聘用材料：可能需要聘用合同或公司出具的邀请材料。","办理流程：查阅官方机关/签证中心的最新公告与提交方式。","注意：最终要求以各国官方发布为准，本资料仅供一般参考。"]}},
+    {id:4,title:{ko:"언어 능력 준비와 증명",zh:"语言能力准备与证明"},summary:{ko:"한국어·중국어·영어 능력과 공인 증명을 미리 정리하세요.",zh:"提前整理韩语、中文、英语能力与官方证明。"},detail:{ko:["한국어: TOPIK 급수와 활용 가능 수준을 기록하세요.","중국어: HSK 급수와 회화·작문 수준을 구분해 적으세요.","영어: CEFR 등급 또는 공인 시험 점수를 기재하세요.","증명서: 유효기간과 발급처를 확인하고, 지원 전 재발급 여부를 점검하세요.","실전: 면접에서는 간결하고 명확하게 의견을 전달하는 연습을 하세요."],zh:["韩语：记录 TOPIK 等级与可运用水平。","中文：区分 HSK 等级与口语、写作水平。","英语：填写 CEFR 等级或官方考试分数。","证明材料：核对有效期与出具机构，投递前确认是否需要重发。","实战：练习在面试中简洁清晰地表达观点。"]}},
+    {id:5,title:{ko:"구직 채널과 지원 준비",zh:"求职渠道与投递准备"},summary:{ko:"플랫폼, 포트폴리오, 지원 시기와 팔로업을 정리하세요.",zh:"梳理平台、作品集、投递时机与跟进节奏。"},detail:{ko:["채널: 국내외 채용 플랫폼, 학교 취업처, 지인 추천을 함께 활용하세요.","포트폴리오: 프로젝트·과제·작업물을 링크나 파일로 정리하세요.","지원 시기: 채용 공고의 마감과 전형 일정을 캘린더에 기록하세요.","맞춤화: 기업·직무에 맞춰 자기소개와 경험 문구를 조정하세요.","팔로업: 제출 후 일정 기간이 지나면 진행 상황을 예의 있게 확인하세요."],zh:["渠道：结合国内外招聘平台、学校就业部门与熟人推荐。","作品集：把项目、课题与作品整理成链接或文件。","投递时机：把招聘截止日期与流程节点记入日历。","定制化：根据企业与岗位调整自我介绍和经历表述。","跟进：提交后经过一段时间，礼貌地询问进展。"]}}
   ];
 
   function cEl(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
@@ -454,37 +457,41 @@ const originalTranslate=translate;translate=function(){originalTranslate();assis
   }
 
   function renderVideos(){
-    const row=document.getElementById("cbVideoRow");if(!row)return;row.replaceChildren();
+    const grid=document.getElementById("cbVideoGrid");if(!grid)return;grid.replaceChildren();
     VIDEOS.forEach(v=>{
-      const card=cEl("article","cb-video-card");
+      const card=cEl("article","cb-video-card "+v.ratio);
       const thumb=cEl("div","cb-video-thumb");
-      if(v.youtubeId){const img=cEl("img");img.src="https://img.youtube.com/vi/"+v.youtubeId+"/hqdefault.jpg";img.alt=tr(v.title);img.loading="lazy";thumb.append(img);}
-      else thumb.append(cEl("span","cb-pending",t("mag.pending")));
+      const img=cEl("img");img.src="https://img.youtube.com/vi/"+v.youtubeId+"/hqdefault.jpg";img.alt=tr(v.title);img.loading="lazy";img.addEventListener("error",()=>{img.style.display="none";});thumb.append(img);
       const play=cEl("button","cb-play");play.type="button";play.setAttribute("aria-label","play");
       play.addEventListener("click",()=>openVideo(v));thumb.append(play);card.append(thumb);
       const info=cEl("div","cb-video-info");
       info.append(cEl("h3","",tr(v.title)));
-      const meta=cEl("div","cb-video-meta");meta.append(cEl("span","",catLabel(v.cat)));meta.append(cEl("span","",v.duration));info.append(meta);
-      const acts=cEl("div","cb-video-meta");
-      const share=cEl("button","cb-mini",t("vid.share"));share.type="button";share.addEventListener("click",()=>shareVideo(v));acts.append(share);info.append(acts);
-      card.append(info);row.append(card);
+      const meta=cEl("div","cb-video-meta");meta.append(cEl("span","",tr(v.summary)));info.append(meta);
+      card.append(info);grid.append(card);
     });
   }
 
   function renderNews(){
     const grid=document.getElementById("cbNewsGrid");if(!grid)return;grid.replaceChildren();
     NEWS.forEach(n=>{
-      const card=cEl("div","cb-news-card");card.append(cEl("h3","",tr(n.title)));card.append(cEl("p","",tr(n.summary)));grid.append(card);
+      const card=cEl("div","cb-news-card");
+      card.append(cEl("h3","",tr(n.title)));
+      card.append(cEl("p","",tr(n.summary)));
+      card.append(cEl("span","cb-news-more",t("news.more")+" →"));
+      card.addEventListener("click",()=>openNews(n));
+      grid.append(card);
     });
   }
 
-  function renderSources(){
-    const body=document.getElementById("cbSourceBody");if(!body)return;body.replaceChildren();
-    SOURCES.forEach(s=>{
-      const trNode=cEl("tr");
-      trNode.innerHTML="<td><a href='"+s.url+"' target='_blank' rel='noopener'>"+tr(s.subject)+"</a></td><td>"+tr(s.author)+"</td><td>"+tr(s.license)+"</td><td>"+tr(s.note)+"</td>";
-      body.append(trNode);
-    });
+  /* 뷰 전환 (페이지 분할) */
+  const VIEWS=["magazine","jobs","resume","interview","analysis"];
+  function showView(name){
+    if(!VIEWS.includes(name))name="magazine";
+    document.querySelectorAll(".cb-view").forEach(v=>v.classList.toggle("active",v.dataset.view===name));
+    document.querySelectorAll("#cbNav a").forEach(a=>a.classList.toggle("active",a.dataset.nav===name));
+    assistantTab=(name==="resume"||name==="interview"||name==="analysis")?name:"jobs";
+    assistRender();
+    window.scrollTo({top:0,behavior:"smooth"});
   }
 
   /* 슬라이드쇼 */
@@ -518,29 +525,37 @@ const originalTranslate=translate;translate=function(){originalTranslate();assis
     const backdrop=document.getElementById("cbPopupBackdrop");
     const body=document.getElementById("cbPopupBody");
     document.getElementById("cbPopupTitle").textContent=tr(v.title);
-    if(v.youtubeId){
-      body.innerHTML='<iframe src="https://www.youtube.com/embed/'+v.youtubeId+'" title="'+tr(v.title)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe><div class="cb-popup-meta"><span>'+t("vid.source")+': '+(v.source?"<a href='"+v.source+"' target='_blank' rel='noopener'>"+v.source+"</a>":"—")+"</span><span>"+t("vid.author")+": "+(v.author||"—")+"</span><span>"+tr(v.summary)+"</span></div>";
-    }else{
-      body.innerHTML='<div class="cb-popup-meta"><strong>'+t("mag.pending")+'</strong><p>'+tr(v.summary)+"</p></div>";
-    }
+    body.innerHTML='<iframe src="https://www.youtube.com/embed/'+v.youtubeId+'?rel=0" title="'+tr(v.title)+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe><div class="cb-popup-meta"><span>'+t("vid.source")+': '+(v.source?"<a href='"+v.source+"' target='_blank' rel='noopener'>"+v.source+"</a>":"—")+"</span><span>"+tr(v.summary)+"</span></div>";
     backdrop.classList.add("open");
   }
-  function closePopup(){document.getElementById("cbPopupBackdrop").classList.remove("open");}
 
-  async function shareVideo(v){
-    const data={title:tr(v.title),text:tr(v.summary),url:location.href};
-    if(navigator.share){try{await navigator.share(data);return;}catch(e){}}
-    try{await navigator.clipboard.writeText(location.href);alert(cur()==="zh"?"链接已复制":"링크가 복사되었습니다");}
-    catch(e){prompt(cur()==="zh"?"复制链接：":"링크 복사：",location.href);}
+  /* 뉴스 상세 팝업 */
+  function openNews(n){
+    const backdrop=document.getElementById("cbPopupBackdrop");
+    const body=document.getElementById("cbPopupBody");
+    document.getElementById("cbPopupTitle").textContent=tr(n.title);
+    const list=cEl("div","cb-news-detail");
+    const ul=cEl("ul");
+    (n.detail[cur()]||[]).forEach(item=>ul.append(cEl("li","",item)));
+    list.append(ul);
+    body.replaceChildren(list);
+    backdrop.classList.add("open");
   }
+
+  function closePopup(){document.getElementById("cbPopupBackdrop").classList.remove("open");}
 
   document.addEventListener("DOMContentLoaded",()=>{
     initSlides();window.cbRender();
     const close=document.getElementById("cbPopupClose");if(close)close.addEventListener("click",closePopup);
     const bd=document.getElementById("cbPopupBackdrop");if(bd)bd.addEventListener("click",e=>{if(e.target===bd)closePopup();});
+    document.querySelectorAll("#cbNav a").forEach(a=>{
+      a.addEventListener("click",e=>{e.preventDefault();showView(a.dataset.nav);history.replaceState(null,"","#"+a.dataset.nav);});
+    });
+    const start=location.hash.replace("#","");
+    if(VIEWS.includes(start))showView(start);else showView("magazine");
+    window.addEventListener("hashchange",()=>{const m=location.hash.replace("#","");if(VIEWS.includes(m))showView(m);});
   });
 
-  window.cbRender=function(){renderStatic();renderPosts();renderVideos();renderNews();renderSources();};
+  window.cbRender=function(){renderStatic();renderPosts();renderVideos();renderNews();};
 })();
 </script></body></html>
-feat: 合并杂志/短视频/资讯/来源页等新内容
