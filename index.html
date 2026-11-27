@@ -388,7 +388,35 @@ function resumeValidation(){
  }
  return errors;
 }
+// 部署 Worker 后把下面填成你的 Worker 地址，例如 https://cb-translate.你的子域.workers.dev
+// 留空时回退到 Google 公共端点（不稳定，仅供临时使用）。
+const TL_PROXY='';
+async function mmTranslate(text,sl,tl){
+  const c=new AbortController();const ct=setTimeout(()=>c.abort(),9000);
+  try{
+    const url='https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair='+sl+'|'+tl;
+    const r=await fetch(url,{signal:c.signal});
+    if(!r.ok)throw new Error('http '+r.status);
+    const j=await r.json();
+    const txt=j&&j.responseData&&j.responseData.translatedText;
+    if(!txt||j.responseStatus!==200)throw new Error('empty');
+    const div=document.createElement('div');div.innerHTML=txt;
+    const out=div.textContent;
+    if(!out||out.trim()===text.trim())throw new Error('untranslated');
+    return out;
+  }finally{clearTimeout(ct);}
+}
 async function translateText(text,sl,tl){
+  if(TL_PROXY){
+    const pc=new AbortController();const pt=setTimeout(()=>pc.abort(),9000);
+    try{
+      const r=await fetch(TL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},signal:pc.signal,body:JSON.stringify({source:sl,target:tl,text})});
+      const j=await r.json();
+      if(j&&j.translatedText)return j.translatedText;
+      throw new Error('proxy no result');
+    }finally{clearTimeout(pt);}
+  }
+  try{const out=await mmTranslate(text,sl,tl);if(out)return out;}catch(_){}
   const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl='+sl+'&tl='+tl+'&dt=t&q='+encodeURIComponent(text);
   const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),9000);
   try{
@@ -406,24 +434,28 @@ async function autoTranslate(dir){
   const longKeys=['work','internship','campus'];
   for(const key of ASSIST_FIELDS){
     if(key==='name'||key==='contact')continue;
-    const src=dir==='ko'?assistantKorean[key].trim():sourceValue(key);
+    const src=dir==='ko'?assistantData[key].trim():assistantKorean[key].trim();
     if(!src)continue;
     const dstEl=document.getElementById(dir==='ko'?('assist-ko-'+key):('assist-'+key));
     if(dir==='ko'?assistantKorean[key].trim():assistantData[key].trim())continue;
     try{
+      let translated;
       if(longKeys.includes(key)){
         const lines=src.split(/\n+/);const outLines=[];
-        for(const ln of lines){const t=ln.trim();outLines.push(t?await translateText(t,dir==='ko'?'zh-CN':'ko',dir==='ko'?'ko':'zh-CN'):'');}
-        if(dir==='ko')assistantKorean[key]=outLines.join('\n');else assistantData[key]=outLines.join('\n');
+        for(const ln of lines){const t=ln.trim();if(!t){outLines.push('');continue;}const r=await translateText(t,dir==='ko'?'zh-CN':'ko',dir==='ko'?'ko':'zh-CN');if(!r)throw new Error('empty');outLines.push(r);}
+        translated=outLines.join('\n');
       }else{
         const res=await translateText(src,dir==='ko'?'zh-CN':'ko',dir==='ko'?'ko':'zh-CN');
-        if(dir==='ko')assistantKorean[key]=res;else assistantData[key]=res;
+        if(!res)throw new Error('empty');
+        translated=res;
       }
-      if(dstEl)dstEl.value=dir==='ko'?assistantKorean[key]:assistantData[key];
+      if(dir==='ko')assistantKorean[key]=translated;else assistantData[key]=translated;
+      if(dstEl)dstEl.value=translated;
       done++;
     }catch(e){fail++;}
   }
-  if(fail){err.textContent=A('autoTrPartial').replace('{n}',String(fail));}
+  if(fail&&done===0){err.textContent=A('autoTrFail');}
+  else if(fail){err.textContent=A('autoTrPartial').replace('{n}',String(fail));}
   else if(done){err.textContent=A('autoTrDone');}
   else{err.textContent=lang==='zh'?'没有需要翻译的字段（源语言为空，或目标语言已填写）。':'번역할 항목이 없습니다(원문 미입력 또는 대상 언어 이미 작성).';}
 }
