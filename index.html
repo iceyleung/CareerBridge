@@ -57,6 +57,7 @@
 .cb-video-info{padding:11px;display:flex;flex-direction:column;gap:5px}
 .cb-video-info h3{font-size:13px;line-height:1.4;margin:0}
 .cb-video-meta{display:flex;justify-content:space-between;color:#546b86;font-size:12px}
+.cb-video-note{text-align:center;color:#6b8099;font-size:12.5px;margin:12px 0 0}
 .cb-mini{border:1px solid #c5d5ea;background:#fff;border-radius:8px;padding:6px 10px;font-size:12px;color:#1a5ba6}
 .cb-mini:hover{background:#e8f1fb}
 .cb-news-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -88,6 +89,7 @@
 <section class="cb-section" id="cbMagVideos">
   <div class="cb-section-head"><h2 data-cb="vid.title">인기 숏폼 · 인터뷰 영상</h2><p data-cb="vid.sub">30~60초 세로형 콘텐츠</p></div>
   <div class="cb-video-grid" id="cbVideoGrid"></div>
+  <p class="cb-video-note" data-cb="vid.note"></p>
 </section>
 
 <!-- 카드뉴스 -->
@@ -476,7 +478,7 @@ const originalTranslate=translate;translate=function(){originalTranslate();assis
       "nav.magazine":"매거진","nav.jobs":"채용 추천","nav.resume":"한중 이력서","nav.interview":"면접 준비","nav.analysis":"커리어 분석",
       "hero.ctaJobs":"채용정보 바로가기","hero.ctaMag":"매거진 보기",
       "mag.title":"CareerBridge 매거진","mag.sub":"취업 정보와 실제 경험을 공유하는 디지털 콘텐츠","mag.read":"읽기","mag.pending":"콘텐츠 준비 중",
-      "vid.title":"매거진 영상","vid.sub":"유튜브 영상을 사이트 내에서 바로 재생합니다","vid.source":"원본 영상",
+      "vid.title":"매거진 영상","vid.sub":"유튜브 영상을 사이트 내에서 바로 재생할 수 있습니다","vid.note":"실제 사용자가 공유한 영상입니다","vid.source":"원본 영상",
       "news.title":"한·중 취업 정보 카드뉴스","news.sub":"채용 문화와 준비 체크리스트","news.more":"자세히 보기",
       "cat.class":"1분 취업 클래스","cat.interview":"한·중 청년 인터뷰","cat.vlog":"글로벌 직장인 VLOG","cat.news":"취업 카드뉴스"
     },
@@ -484,7 +486,7 @@ const originalTranslate=translate;translate=function(){originalTranslate();assis
       "nav.magazine":"杂志","nav.jobs":"职位推荐","nav.resume":"双语简历","nav.interview":"面试准备","nav.analysis":"职业分析",
       "hero.ctaJobs":"查看职位","hero.ctaMag":"浏览杂志",
       "mag.title":"CareerBridge 杂志","mag.sub":"分享求职信息与真实经验的数字内容","mag.read":"阅读","mag.pending":"内容准备中",
-      "vid.title":"杂志视频","vid.sub":"在站内直接播放 YouTube 视频","vid.source":"原视频",
+      "vid.title":"杂志视频","vid.sub":"可在站内直接播放 YouTube 视频","vid.note":"真实用户视频分享","vid.source":"原视频",
       "news.title":"中韩求职图文资讯","news.sub":"招聘文化与准备清单","news.more":"查看详情",
       "cat.class":"一分钟求职课堂","cat.interview":"中韩青年访谈","cat.vlog":"全球职场VLOG","cat.news":"求职资讯"
     }
