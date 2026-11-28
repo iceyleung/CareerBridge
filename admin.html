@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerBridge 管理后台</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui,sans-serif}
+body{max-width:1100px;margin:2rem auto;padding:0 16px;background:#f7f8fa}
+.card{background:#fff;padding:20px;border-radius:12px;margin-bottom:16px;box-shadow:0 2px 8px #00000012}
+input,textarea,select{width:100%;padding:10px;margin:6px 0 12px;border:1px solid #ddd;border-radius:8px}
+button{padding:10px 16px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer;margin-right:8px}
+button.del{background:#dc2626}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{padding:10px 14px;background:#eef2ff;border-radius:8px;cursor:pointer}
+.tab.active{background:#2563eb;color:#fff}
+.item{border:1px solid #eee;padding:12px;border-radius:8px;margin:8px 0}
+#loginBox{max-width:420px;margin:4rem auto}
+</style>
+</head>
+<body>
+<div id="loginBox" class="card">
+  <h2>管理员登录</h2>
+  <input type="password" id="pwd" placeholder="请输入管理员密码">
+  <button onclick="login()">登录后台</button>
+</div>
+
+<div id="adminPanel" style="display:none">
+  <h1>CareerBridge 内容管理</h1>
+  <div class="tabs">
+    <div class="tab active" data-tab="magazine">杂志</div>
+    <div class="tab" data-tab="jobs">职位推荐</div>
+    <div class="tab" data-tab="videos">视频</div>
+  </div>
+
+  <!-- 杂志 -->
+  <div class="tabPage" id="magazine">
+    <div class="card">
+      <h3>新增杂志文章</h3>
+      <input type="text" id="m_zh_title" placeholder="中文标题">
+      <input type="text" id="m_kr_title" placeholder="韩文标题">
+      <textarea id="m_zh_content" rows="6" placeholder="中文内容"></textarea>
+      <textarea id="m_kr_content" rows="6" placeholder="韩文内容"></textarea>
+      <button onclick="addMagazine()">提交</button>
+    </div>
+    <div class="card">
+      <h3>文章列表</h3>
+      <div id="magList"></div>
+    </div>
+  </div>
+
+  <!-- 职位 -->
+  <div class="tabPage" id="jobs" style="display:none">
+    <div class="card">
+      <h3>新增职位</h3>
+      <input type="text" id="j_title" placeholder="职位名称">
+      <input type="text" id="j_company" placeholder="公司名">
+      <input type="text" id="j_loc" placeholder="工作地点">
+      <input type="text" id="j_salary" placeholder="薪资">
+      <input type="text" id="j_link" placeholder="详情链接">
+      <input type="text" id="j_lang" placeholder="地区：cn / kr">
+      <button onclick="addJob()">提交</button>
+    </div>
+    <div class="card">
+      <h3>职位列表</h3>
+      <div id="jobList"></div>
+    </div>
+  </div>
+
+  <!-- 视频 -->
+  <div class="tabPage" id="videos" style="display:none">
+    <div class="card">
+      <h3>新增视频</h3>
+      <input type="text" id="v_title" placeholder="视频标题">
+      <input type="text" id="v_yt" placeholder="Youtube链接">
+      <input type="text" id="v_desc" placeholder="简介">
+      <button onclick="addVideo()">提交</button>
+    </div>
+    <div class="card">
+      <h3>视频列表</h3>
+      <div id="videoList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://careerbridge-admin-api.icey0921.workers.dev";
+const ADMIN_PWD = "admin123"; // 可以在这里修改密码
+let token = "";
+
+// 标签切换
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('.tabPage').forEach(p=>p.style.display='none');
+    document.getElementById(t.dataset.tab).style.display='block';
+    loadData(t.dataset.tab);
+  }
+})
+
+function login(){
+  const p = document.getElementById('pwd').value;
+  if(p===ADMIN_PWD){
+    token = btoa(p);
+    document.getElementById('loginBox').style.display='none';
+    document.getElementById('adminPanel').style.display='block';
+    loadData('magazine');
+  }else alert('密码错误');
+}
+
+async function req(path,method="GET",body=null){
+  const opt = {method,headers:{"Content-Type":"application/json","Authorization":token}}
+  if(body) opt.body=JSON.stringify(body);
+  return await (await fetch(API+path,opt)).json();
+}
+
+// 杂志
+async function loadMagazine(){
+  const res = await req("/magazine");
+  let html = "";
+  res.data.forEach(d=>{
+    html += `<div class="item">
+      <div>${d.title_zh} / ${d.title_kr}</div>
+      <button class="del" onclick="delItem('magazine',${d.id})">删除</button>
+    </div>`
+  })
+  document.getElementById('magList').innerHTML=html;
+}
+async function addMagazine(){
+  await req("/magazine","POST",{
+    title_zh:document.getElementById('m_zh_title').value,
+    title_kr:document.getElementById('m_kr_title').value,
+    content_zh:document.getElementById('m_zh_content').value,
+    content_kr:document.getElementById('m_kr_content').value
+  })
+  loadMagazine();alert("添加成功");
+}
+
+// 职位
+async function loadJobs(){
+  const res = await req("/jobs");
+  let html = "";
+  res.data.forEach(d=>{
+    html += `<div class="item">
+      <div>${d.title} @ ${d.company}</div>
+      <button class="del" onclick="delItem('jobs',${d.id})">删除</button>
+    </div>`
+  })
+  document.getElementById('jobList').innerHTML=html;
+}
+async function addJob(){
+  await req("/jobs","POST",{
+    title:document.getElementById('j_title').value,
+    company:document.getElementById('j_company').value,
+    location:document.getElementById('j_loc').value,
+    salary:document.getElementById('j_salary').value,
+    link:document.getElementById('j_link').value,
+    lang:document.getElementById('j_lang').value
+  })
+  loadJobs();alert("添加成功");
+}
+
+// 视频
+async function loadVideos(){
+  const res = await req("/videos");
+  let html = "";
+  res.data.forEach(d=>{
+    html += `<div class="item">
+      <div>${d.title}</div>
+      <button class="del" onclick="delItem('videos',${d.id})">删除</button>
+    </div>`
+  })
+  document.getElementById('videoList').innerHTML=html;
+}
+async function addVideo(){
+  await req("/videos","POST",{
+    title:document.getElementById('v_title').value,
+    yt_url:document.getElementById('v_yt').value,
+    desc:document.getElementById('v_desc').value
+  })
+  loadVideos();alert("添加成功");
+}
+
+async function delItem(table,id){
+  if(!confirm("确定删除？"))return;
+  await req(`/${table}/${id}`,"DELETE");
+  loadData(table);
+}
+function loadData(tab){
+  if(tab==="magazine") loadMagazine();
+  if(tab==="jobs") loadJobs();
+  if(tab==="videos") loadVideos();
+}
+</script>
+</body>
+</html>
